@@ -187,7 +187,7 @@ var
   RunText: string;
   CurrentFont: ISkFont;
   BgColor, FgColor: TAlphaColor;
-  IsSelected, RunSelected: Boolean;
+  RunSelected: Boolean;
 
   function AttrsEqual(const A, B: TCharAttributes): Boolean; inline;
   begin

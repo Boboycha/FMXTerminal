@@ -43,8 +43,6 @@ type
     FG1: TCharacterSet;
     FUseG1: Boolean;
 
-    function GetParamInt(const S: string; Index: Integer;
-      Default: Integer = 1): Integer;
     procedure ParseSGR(const Params: TArray<Integer>);
     function GetColor256(Index: Integer): TAlphaColor;
     function GetColorRGB(R, G, B: Integer): TAlphaColor;
@@ -52,6 +50,7 @@ type
 
   public
     constructor Create(ATheme: TTerminalTheme);
+    function GetParamInt(const S: string; Index: Integer; Default: Integer = 1): Integer;
     function Parse(const Input: string;
       out Commands: TArray<TAnsiCommand>): Boolean;
     procedure SetTheme(ATheme: TTerminalTheme);
@@ -128,8 +127,7 @@ begin
   end;
 end;
 
-function TAnsiParser.GetParamInt(const S: string; Index: Integer;
-  Default: Integer): Integer;
+function TAnsiParser.GetParamInt(const S: string; Index: Integer; Default: Integer): Integer;
 var
   Parts: TArray<string>;
 begin

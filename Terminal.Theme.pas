@@ -110,7 +110,6 @@ end;
 
 procedure TTerminalTheme.LoadThemeFromFile(const AFileName: string);
 var
-  FullFileName: string;
   Ini: TMemIniFile;
   I: Integer;
 begin

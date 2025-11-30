@@ -1,0 +1,24 @@
+[Theme]
+Name=Solarized Dark
+
+[Colors]
+; Цвета в 8-значном шестнадцатеричном формате AARRGGBB
+DefaultFG=FF839496
+DefaultBG=FF002B36
+
+Ansi0=FF073642
+Ansi1=FFDC322F
+Ansi2=FF859900
+Ansi3=FFB58900
+Ansi4=FF268BD2
+Ansi5=FFD33682
+Ansi6=FF2AA198
+Ansi7=FFEEE8D5
+Ansi8=FF002B36
+Ansi9=FFCB4B16
+Ansi10=FF586E75
+Ansi11=FF657B83
+Ansi12=FF839496
+Ansi13=FF6C71C4
+Ansi14=FF93A1A1
+Ansi15=FFFDF6E3

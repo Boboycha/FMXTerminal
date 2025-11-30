@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Math,
   FMX.Types, FMX.Graphics, FMX.TextLayout,
-  FMX.Skia, Skia,
+  FMX.Skia, Skia, System.Skia,
   Terminal.Types, Terminal.Buffer, System.UIConsts,
   Terminal.Theme;
 
@@ -59,7 +59,6 @@ type
   end;
 
 implementation
-
 
 
 { TTerminalRenderer }
@@ -188,7 +187,7 @@ var
   RunText: string;
   CurrentFont: ISkFont;
   BgColor, FgColor: TAlphaColor;
-  IsSelected, RunSelected: Boolean;
+  RunSelected: Boolean;
 
   function AttrsEqual(const A, B: TCharAttributes): Boolean; inline;
   begin

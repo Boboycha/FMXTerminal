@@ -1,0 +1,24 @@
+[Theme]
+Name=Linux Console
+
+[Colors]
+; Цвета в 8-значном шестнадцатеричном формате AARRGGBB
+DefaultFG=FFAAAAAA
+DefaultBG=FF000000
+
+Ansi0=FF000000
+Ansi1=FFAA0000
+Ansi2=FF00AA00
+Ansi3=FFAA5500
+Ansi4=FF0000AA
+Ansi5=FFAA00AA
+Ansi6=FF00AAAA
+Ansi7=FFAAAAAA
+Ansi8=FF555555
+Ansi9=FFFF5555
+Ansi10=FF55FF55
+Ansi11=FFFF55FF
+Ansi12=FF5555FF
+Ansi13=FFFF55FF
+Ansi14=FF55FFFF
+Ansi15=FFFFFFFF

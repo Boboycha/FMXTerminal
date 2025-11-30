@@ -36,7 +36,8 @@ requires
   xmlrtl,
   Skia.Package.RTL,
   fmx,
-  Skia.Package.FMX;
+  Skia.Package.FMX,
+  Skia.Package.VCL;
 
 contains
   Terminal.Control in 'Terminal.Control.pas',

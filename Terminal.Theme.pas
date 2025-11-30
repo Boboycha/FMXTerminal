@@ -110,16 +110,11 @@ end;
 
 procedure TTerminalTheme.LoadThemeFromFile(const AFileName: string);
 var
-  FullFileName: string;
   Ini: TMemIniFile;
   I: Integer;
 begin
-  // --- *** ИСПРАВЛЕНИЕ: Кросс-платформенный путь *** ---
-  // Используем PathDelim вместо '\'
-  FullFileName := ExtractFilePath(ParamStr(0)) + 'themes' + PathDelim + AFileName;
-  // --- *** КОНЕЦ ИСПРАВЛЕНИЯ *** ---
 
-  if not TFile.Exists(FullFileName) then
+  if not TFile.Exists(AFileName) then
   begin
     // Если файл не найден, просто выходим
     // (останется тема, загруженная по умолчанию в конструкторе)
@@ -128,9 +123,9 @@ begin
     Exit;
   end;
 
-  Ini := TMemIniFile.Create(FullFileName);
+  Ini := TMemIniFile.Create(AFileName);
   try
-    FName := Ini.ReadString('Theme', 'Name', ExtractFileName(AFileName.Split(['.'])[0]));
+    FName := AFileName;// Ini.ReadString('Theme', 'Name', ExtractFileName(AFileName.Split(['.'])[0]));
 
     FDefaultFG := HexToColor(Ini.ReadString('Colors', 'DefaultFG', 'FFE5E5E5'));
     FDefaultBG := HexToColor(Ini.ReadString('Colors', 'DefaultBG', 'FF000000'));

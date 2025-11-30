@@ -68,12 +68,12 @@ type
   protected
     procedure Draw(const Canvas: ISkCanvas; const Dest: TRectF; const Opacity: Single); override;
     procedure Resize; override;
-    procedure KeyDown(var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+    procedure KeyDown(var Key: Word; var KeyChar: WideChar; Shift: TShiftState); override;
 
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure MouseMove(Shift: TShiftState; X, Y: Single);
-    procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
+    procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
 
   public
     constructor Create(AOwner: TComponent); override;

@@ -1,0 +1,322 @@
+object FormMain: TFormMain
+  Left = 0
+  Top = 0
+  Caption = 'FMX Terminal with Skia'
+  ClientHeight = 600
+  ClientWidth = 1000
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object LayoutTop: TLayout
+    Align = Top
+    Size.Width = 1000.000000000000000000
+    Size.Height = 105.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object edHostName: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 3
+      Position.X = 88.000000000000000000
+      Position.Y = 6.000000000000000000
+      Size.Width = 193.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object edUser: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 2
+      Position.X = 88.000000000000000000
+      Position.Y = 33.000000000000000000
+      Size.Width = 193.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Layout1: TLayout
+      Align = MostRight
+      Position.X = 568.000000000000000000
+      Size.Width = 432.000000000000000000
+      Size.Height = 105.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 4
+      object Rectangle1: TRectangle
+        Align = Client
+        Margins.Left = 3.000000000000000000
+        Margins.Top = 3.000000000000000000
+        Margins.Right = 3.000000000000000000
+        Margins.Bottom = 3.000000000000000000
+        Size.Width = 426.000000000000000000
+        Size.Height = 99.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        XRadius = 3.000000000000000000
+        YRadius = 3.000000000000000000
+        object ButtonTest1: TButton
+          Position.Y = 25.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          Text = 'Colors'
+          TextSettings.Trimming = None
+          OnClick = ButtonTest1Click
+        end
+        object ButtonTest2: TButton
+          Position.X = 84.000000000000000000
+          Position.Y = 25.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Text = 'Styles'
+          TextSettings.Trimming = None
+          OnClick = ButtonTest2Click
+        end
+        object ButtonTest3: TButton
+          Position.X = 169.000000000000000000
+          Position.Y = 25.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 2
+          Text = 'Background'
+          TextSettings.Trimming = None
+          OnClick = ButtonTest3Click
+        end
+        object ButtonTest4: TButton
+          Position.X = 253.000000000000000000
+          Position.Y = 25.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
+          Text = 'RGB'
+          TextSettings.Trimming = None
+          OnClick = ButtonTest4Click
+        end
+        object ButtonTest5: TButton
+          Position.X = 338.000000000000000000
+          Position.Y = 25.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 4
+          Text = 'Complex'
+          TextSettings.Trimming = None
+          OnClick = ButtonTest5Click
+        end
+        object Samples: TLabel
+          Position.X = 8.000000000000000000
+          Text = 'Samples'
+          TabOrder = 5
+        end
+      end
+    end
+    object btDisconnect: TButton
+      Position.X = 289.000000000000000000
+      Position.Y = 48.000000000000000000
+      Size.Width = 79.000000000000000000
+      Size.Height = 37.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 9
+      Text = 'Disconnect'
+      TextSettings.Trimming = None
+      OnClick = btDisconnectClick
+    end
+    object Label1: TLabel
+      Position.X = 16.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 64.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Trailing
+      Text = 'Host'
+      TabOrder = 8
+    end
+    object Label2: TLabel
+      Position.X = 16.000000000000000000
+      Position.Y = 35.000000000000000000
+      Size.Width = 64.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Trailing
+      Text = 'User'
+      TabOrder = 7
+    end
+    object Label3: TLabel
+      Position.X = 16.000000000000000000
+      Position.Y = 65.000000000000000000
+      Size.Width = 64.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Trailing
+      Text = 'Password'
+      TabOrder = 6
+    end
+    object edPassword: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 0
+      Password = True
+      Position.X = 88.000000000000000000
+      Position.Y = 63.000000000000000000
+      Size.Width = 193.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object btConnect: TButton
+      Position.X = 289.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 79.000000000000000000
+      Size.Height = 37.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Connect'
+      TextSettings.Trimming = None
+      OnClick = btConnectClick
+    end
+    object btLoadTheme: TButton
+      Position.X = 424.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 37.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 11
+      Text = 'Load theme'
+      TextSettings.Trimming = None
+      OnClick = btLoadThemeClick
+    end
+    object btThemeDefault: TButton
+      Position.X = 424.000000000000000000
+      Position.Y = 48.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 37.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 10
+      Text = 'Default theme'
+      TextSettings.Trimming = None
+    end
+  end
+  object LayoutBottom: TLayout
+    Align = Bottom
+    Position.Y = 550.000000000000000000
+    Size.Width = 1000.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object EditInput: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 0
+      Position.X = 112.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 792.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      OnKeyDown = EditInputKeyDown
+    end
+    object ButtonSend: TButton
+      Position.X = 912.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 75.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Send'
+      TextSettings.Trimming = None
+      OnClick = ButtonSendClick
+    end
+  end
+  object Terminal: TTerminalControl
+    Align = Client
+    HitTest = True
+    Size.Width = 700.000000000000000000
+    Size.Height = 445.000000000000000000
+    Size.PlatformDefault = False
+    OnResized = TerminalResized
+    FontSize = 13.000000000000000000
+    FontFamily = 'Consolas'
+  end
+  object Splitter1: TSplitter
+    Align = Right
+    Cursor = crHSplit
+    MinSize = 20.000000000000000000
+    Position.X = 700.000000000000000000
+    Position.Y = 105.000000000000000000
+    Size.Width = 5.000000000000000000
+    Size.Height = 445.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Layout2: TLayout
+    Align = Right
+    Margins.Right = 6.000000000000000000
+    Position.X = 705.000000000000000000
+    Position.Y = 105.000000000000000000
+    Size.Width = 289.000000000000000000
+    Size.Height = 445.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 8
+    object MemoCommands: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      ReadOnly = True
+      Align = Client
+      Size.Width = 289.000000000000000000
+      Size.Height = 420.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      Viewport.Width = 285.000000000000000000
+      Viewport.Height = 416.000000000000000000
+    end
+    object Label5: TLabel
+      Align = Top
+      Size.Width = 289.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Log'
+      TabOrder = 5
+      object btClear: TButton
+        Align = Right
+        Position.X = 209.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 4
+        Text = 'Clear Log'
+        TextSettings.Trimming = None
+        OnClick = btClearClick
+      end
+    end
+  end
+  object odTheme: TOpenDialog
+    Left = 728
+    Top = 208
+  end
+  object sshShell: TScSSHShell
+    Client = ScSSHClient1
+    OnAsyncReceive = sshShellAsyncReceive
+    NonBlocking = True
+    UseUnicode = True
+    TerminalInfo.Rows = 300
+    TerminalInfo.Height = 1024
+    TerminalInfo.Width = 768
+    TerminalInfo.TerminalType = 'xterm-256color'
+    Left = 768
+    Top = 140
+  end
+  object ScSSHClient1: TScSSHClient
+    KeyStorage = SFS
+    OnServerKeyValidate = ScSSHClient1ServerKeyValidate
+    Left = 848
+    Top = 240
+  end
+  object ScSSHShell1: TScSSHShell
+    Client = ScSSHClient1
+    EventsCallMode = ecSynchronous
+    Left = 777
+    Top = 426
+  end
+  object SFS: TScFileStorage
+    Left = 840
+    Top = 152
+  end
+end

@@ -1,0 +1,77 @@
+# Delphi build output
+*.dcu
+*.dcp
+*.dcpil
+*.so
+*.apk
+*.a
+*.o
+*.obj
+*.hpp
+*.lib
+*.dll
+*.bpl
+*.drl
+*.dres
+*.tds
+*.dbg
+*.map
+*.zip
+
+# Cache & temp
+__history/
+__recovery/
+__debug/
+__design/
+*.local
+*.identcache
+*.projdata
+*.tvsconfig
+*.vrc
+*.stats
+*.log
+
+# Intermediate files
+*.tmp
+*.cache
+*.class
+*.~*
+*.bak
+
+# FMX / Compiled assets
+*.gdk
+*.compiled
+
+# Build folders
+Win32/
+Win64/
+Linux64/
+macOS64/
+iOSDevice64/
+Android/
+Android64/
+
+# Delphi IDE
+*.dproj.local
+*.dsk
+*.otares
+*.grouplocal
+
+# RAD Studio autosave
+*.local
+*.identcache
+
+# C++ Builder (если вдруг)
+*.pch
+*.pdb
+
+# Binaries
+bin/
+binaries/
+build/
+output/
+out/
+
+# Node / Web modules (если есть web-модули)
+node_modules/
+dist/

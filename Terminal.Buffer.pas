@@ -356,7 +356,6 @@ var
   I, J, K: Integer;
   Line: TTerminalLine;
   Attr: TCharAttributes;
-  Found: Boolean;
 begin
   if (Buffer = nil) or (OldTheme = nil) or (NewTheme = nil) then Exit;
 
@@ -369,11 +368,9 @@ begin
     begin
       Attr := Line[J].Attributes;
 
-      Found := False;
       if Attr.ForegroundColor = OldTheme.DefaultFG then
       begin
         Line[J].Attributes.ForegroundColor := NewTheme.DefaultFG;
-        Found := True;
       end
       else
       begin
@@ -382,17 +379,14 @@ begin
           if Attr.ForegroundColor = OldTheme.AnsiColors[K] then
           begin
             Line[J].Attributes.ForegroundColor := NewTheme.AnsiColors[K];
-            Found := True;
             Break;
           end;
         end;
       end;
 
-      Found := False;
       if Attr.BackgroundColor = OldTheme.DefaultBG then
       begin
         Line[J].Attributes.BackgroundColor := NewTheme.DefaultBG;
-        Found := True;
       end
       else
       begin
@@ -401,7 +395,6 @@ begin
           if Attr.BackgroundColor = OldTheme.AnsiColors[K] then
           begin
             Line[J].Attributes.BackgroundColor := NewTheme.AnsiColors[K];
-            Found := True;
             Break;
           end;
         end;
@@ -840,14 +833,12 @@ end;
 
 procedure TTerminalBuffer.Resize(NewWidth, NewHeight: Integer);
 var
-  I, J: Integer;
+  I: Integer;
   OldMainLines, OldAltLines: TList<TTerminalLine>;
-  NewLine: TTerminalLine;
 
   procedure ResizeBuffer(Lines: TList<TTerminalLine>; OldLines: TList<TTerminalLine>);
   var
     I, J: Integer;
-    NewLine: TTerminalLine;
   begin
     Lines.Clear;
     for I := 0 to NewHeight - 1 do
@@ -1015,7 +1006,7 @@ end;
 
 function TTerminalBuffer.GetSelectedText: string;
 var
-  Y, X, StartX, EndX: Integer;
+  X, StartX, EndX: Integer;
   Line: TTerminalLine;
   AbsY: Integer;
   ResultStr: TStringBuilder;

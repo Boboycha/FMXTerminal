@@ -121,6 +121,9 @@ type
     property ViewportOffset: Integer read FViewportOffset;
 
     property HasSelection: Boolean read FHasSelection;
+
+    // --- НОВОЕ СВОЙСТВО ---
+    property IsAlternateBuffer: Boolean read FUseAlternateBuffer;
   end;
 
 implementation
@@ -332,8 +335,6 @@ end;
 
 function TTerminalBuffer.IsLineDirty(Index: Integer): Boolean;
 begin
-  // Если есть выделение, мы всегда перерисовываем все,
-  // так как выделение может меняться динамически
   if FHasSelection then Exit(True);
 
   if FViewportOffset > 0 then Exit(True);
@@ -515,7 +516,6 @@ begin
   FLastMouseCol := -1;
   FLastMouseRow := -1;
 
-  // Инициализация выделения
   FHasSelection := False;
   FSelStart := TPoint.Create(0, 0);
   FSelEnd := TPoint.Create(0, 0);
@@ -807,7 +807,7 @@ begin
   end;
 
   case Ch of
-    #7: Exit; // Игнорируем звонок (Bell), чтобы не было артефактов
+    #7: Exit;
     #10: begin if FCursor.Y = FScrollBottom then ScrollUp(1) else begin Inc(FCursor.Y); if FCursor.Y >= FHeight then FCursor.Y := FHeight - 1; end; Exit; end;
     #13: begin FCursor.X := 0; Exit; end;
     #8: begin if FCursor.X > 0 then Dec(FCursor.X); Exit; end;
@@ -937,7 +937,7 @@ begin
     FSavedCursorAlt.X := EnsureRange(FSavedCursorAlt.X, 0, FWidth - 1);
     FSavedCursorAlt.Y := EnsureRange(FSavedCursorAlt.Y, 0, FHeight - 1);
 
-    ClearSelection; // Сбрасываем выделение при ресайзе, чтобы не было багов
+    ClearSelection;
     SetAllDirty;
 
   finally
@@ -945,8 +945,6 @@ begin
     OldAltLines.Free;
   end;
 end;
-
-// --- РЕАЛИЗАЦИЯ НОВЫХ МЕТОДОВ ВЫДЕЛЕНИЯ ---
 
 function TTerminalBuffer.GetTotalLinesCount: Integer;
 begin

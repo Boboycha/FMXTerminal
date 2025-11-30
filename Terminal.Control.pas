@@ -635,7 +635,7 @@ begin
   end;
   // ----------------------------
 
-//  IsMouseReporting := FBuffer.MouseModes <> [];
+  IsMouseReporting := FBuffer.MouseModes <> [];
   // --- ИЗМЕНЕНИЕ: OverrideSelection = ВСЕГДА, если зажат Shift ---
   OverrideSelection := (ssShift in Shift);
 
@@ -692,7 +692,7 @@ begin
   end;
   // ----------------------------
 
-//  IsMouseReporting := FBuffer.MouseModes <> [];
+  IsMouseReporting := FBuffer.MouseModes <> [];
   // --- ИЗМЕНЕНИЕ: OverrideSelection = ВСЕГДА, если зажат Shift ---
   OverrideSelection := (ssShift in Shift);
 

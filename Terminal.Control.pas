@@ -5,10 +5,10 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   System.Math, System.Generics.Collections,
-  FMX.Types, FMX.Controls, FMX.Graphics, FMX.Dialogs, System.Skia,
-   FMX.Consts, FMX.Platform,
+  FMX.Types, FMX.Controls, FMX.Graphics, FMX.Dialogs,
+  FMX.Skia, Skia, FMX.Consts, FMX.Platform,
   Terminal.Types, Terminal.Buffer, Terminal.AnsiParser, Terminal.Renderer,
-  Terminal.Theme, FMX.Skia;
+  Terminal.Theme;
 
 type
   TTerminalDataEvent = procedure(const S: string) of object;
@@ -39,6 +39,8 @@ type
     // --- ДЛЯ ВЫДЕЛЕНИЯ ---
     FIsSelecting: Boolean;
     FSelectionStartAbs: TPoint; // Абсолютные координаты начала выделения
+    FAutoCopySelection: Boolean; // Копировать сразу при выделении
+    FPasteOnRightClick: Boolean; // Вставлять по правому клику
     // ---------------------
 
     procedure CursorTimerProc(Sender: TObject);
@@ -68,12 +70,12 @@ type
   protected
     procedure Draw(const Canvas: ISkCanvas; const Dest: TRectF; const Opacity: Single); override;
     procedure Resize; override;
-    procedure KeyDown(var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+    procedure KeyDown(var Key: Word; var KeyChar: WideChar; Shift: TShiftState); override;
 
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure MouseMove(Shift: TShiftState; X, Y: Single);
-    procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
+    procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -93,6 +95,10 @@ type
     property Rows: Integer read GetRows;
 
     property EnableSyntaxHighlighting: Boolean read FEnableSyntaxHighlighting write FEnableSyntaxHighlighting;
+
+    // Новые свойства для настройки поведения
+    property AutoCopySelection: Boolean read FAutoCopySelection write FAutoCopySelection;
+    property PasteOnRightClick: Boolean read FPasteOnRightClick write FPasteOnRightClick;
 
   published
     property FontSize: Single read GetFontSize write SetFontSize;
@@ -139,6 +145,8 @@ begin
   FEnableSyntaxHighlighting := False;
 
   FIsSelecting := False;
+  FAutoCopySelection := True; // По умолчанию копируем при выделении (как в Putty)
+  FPasteOnRightClick := True; // По умолчанию вставка правой кнопкой
 
   TabStop := False;
   CanFocus := True;
@@ -264,7 +272,7 @@ var
   I: Integer;
   ProcessedText: string;
 begin
-  if FEnableSyntaxHighlighting and (FSyntaxRules.Count > 0) then
+  if FEnableSyntaxHighlighting and (FSyntaxRules.Count > 0) and (not FBuffer.IsAlternateBuffer) then
     ProcessedText := ApplyHighlighting(Text)
   else
     ProcessedText := Text;
@@ -354,7 +362,8 @@ begin
   if TPlatformServices.Current.SupportsPlatformService(IFMXClipboardService, ClipboardService) then
   begin
     Text := FBuffer.GetSelectedText;
-    ClipboardService.SetClipboard(Text);
+    if Text <> '' then
+      ClipboardService.SetClipboard(Text);
   end;
 end;
 
@@ -364,6 +373,12 @@ var
   Value: TValue;
   Text: string;
 begin
+  if FBuffer.HasSelection then
+  begin
+    FBuffer.ClearSelection;
+    FNeedRedraw := True;
+  end;
+
   if TPlatformServices.Current.SupportsPlatformService(IFMXClipboardService, ClipboardService) then
   begin
     Value := ClipboardService.GetClipboard;
@@ -383,6 +398,7 @@ var
 begin
   // --- ОБРАБОТКА COPY/PASTE ---
   // Ctrl + Shift + C  или  Ctrl + Insert -> Копировать
+  // (Здесь выделение НЕ сбрасываем, так как это операция копирования)
   if ((ssCtrl in Shift) and (ssShift in Shift) and (Key = vkC)) or
      ((ssCtrl in Shift) and (Key = vkInsert)) then
   begin
@@ -403,6 +419,14 @@ begin
 
   if (S <> '') and Assigned(FOnData) then
   begin
+    // --- ИЗМЕНЕНИЕ: Любой ввод данных (нажатие клавиш) сбрасывает выделение ---
+    if FBuffer.HasSelection then
+    begin
+      FBuffer.ClearSelection;
+      FNeedRedraw := True;
+    end;
+    // -------------------------------------------------------------------------
+
     FOnData(S);
 
     // Если нажали клавишу и что-то отправили, и при этом не держим Shift -
@@ -544,38 +568,42 @@ procedure TTerminalControl.MouseDown(Button: TMouseButton; Shift: TShiftState;
 var
   Col, Row, Cb, AbsY: Integer;
   IsMouseReporting: Boolean;
-  OverrideSelection: Boolean; // Если нажат Shift при активном Mouse Reporting
+  OverrideSelection: Boolean;
 begin
   SetFocus;
   if (FRenderer.CharWidth = 0) or (FRenderer.CharHeight = 0) then Exit;
 
-  Col := Trunc(X / FRenderer.CharWidth); // 0-based для выделения
-  Row := Trunc(Y / FRenderer.CharHeight); // 0-based
+  Col := Trunc(X / FRenderer.CharWidth);
+  Row := Trunc(Y / FRenderer.CharHeight);
 
-  // Для отправки в терминал нужны 1-based координаты
   var RepCol := Col + 1;
   var RepRow := Row + 1;
 
   IsMouseReporting := FBuffer.MouseModes <> [];
-  OverrideSelection := IsMouseReporting and (ssShift in Shift);
+  // --- ИЗМЕНЕНИЕ: OverrideSelection = ВСЕГДА, если зажат Shift ---
+  OverrideSelection := (ssShift in Shift);
 
-  // --- ЛОГИКА ВЫДЕЛЕНИЯ ---
-  // Включаем выделение, если:
-  // 1. Отчет мыши выключен (обычный режим)
-  // 2. ИЛИ нажат Shift (принудительное выделение поверх mc/htop)
+  // --- ЛОГИКА ВЫДЕЛЕНИЯ И ВСТАВКИ ---
+  // Если мышь НЕ отслеживается (обычный режим) ИЛИ зажат Shift (принудительное выделение)
   if (not IsMouseReporting) or OverrideSelection then
   begin
     if Button = TMouseButton.mbLeft then
     begin
       AbsY := FBuffer.ScreenYToAbsolute(Row);
       FSelectionStartAbs := TPoint.Create(Col, AbsY);
+      // Новое выделение перезаписывает старое (фактически очищая его)
       FBuffer.SetSelection(Col, AbsY, Col, AbsY);
       FIsSelecting := True;
       FNeedRedraw := True;
+    end
+    else if (Button = TMouseButton.mbRight) and FPasteOnRightClick then
+    begin
+      // Правый клик -> Вставка. Внутри PasteFromClipboard теперь есть очистка выделения.
+      PasteFromClipboard;
     end;
-    Exit; // Не отправляем отчет мыши, если выделяем
+    Exit;
   end;
-  // -----------------------
+  // ---------------------------------
 
   case Button of
     TMouseButton.mbLeft: Cb := 0;
@@ -594,16 +622,25 @@ procedure TTerminalControl.MouseUp(Button: TMouseButton; Shift: TShiftState;
   X, Y: Single);
 var
   Col, Row, Cb: Integer;
+  IsMouseReporting: Boolean;
+  OverrideSelection: Boolean;
 begin
   // --- ЗАВЕРШЕНИЕ ВЫДЕЛЕНИЯ ---
   if FIsSelecting then
   begin
     FIsSelecting := False;
-    // Если нужно копировать сразу при выделении (как в Putty):
-    // CopyToClipboard;
+    if FAutoCopySelection and FBuffer.HasSelection then
+      CopyToClipboard;
     Exit;
   end;
   // ----------------------------
+
+//  IsMouseReporting := FBuffer.MouseModes <> [];
+  // --- ИЗМЕНЕНИЕ: OverrideSelection = ВСЕГДА, если зажат Shift ---
+  OverrideSelection := (ssShift in Shift);
+
+  // Если зажат Shift, мы не отправляем MouseUp в приложение
+  if OverrideSelection then Exit;
 
   if FBuffer.MouseModes = [] then
     Exit;
@@ -633,6 +670,8 @@ end;
 procedure TTerminalControl.MouseMove(Shift: TShiftState; X, Y: Single);
 var
   Col, Row, Cb, AbsY: Integer;
+  IsMouseReporting: Boolean;
+  OverrideSelection: Boolean;
 begin
   if (FRenderer.CharWidth = 0) or (FRenderer.CharHeight = 0) then Exit;
 
@@ -642,20 +681,27 @@ begin
   // --- ОБНОВЛЕНИЕ ВЫДЕЛЕНИЯ ---
   if FIsSelecting then
   begin
-    // Ограничиваем координаты, чтобы не выйти за экран
     Col := Max(0, Min(Col, FBuffer.Width - 1));
     Row := Max(0, Min(Row, FBuffer.Height - 1));
 
     AbsY := FBuffer.ScreenYToAbsolute(Row);
 
-    // Обновляем конец выделения
     FBuffer.SetSelection(FSelectionStartAbs.X, FSelectionStartAbs.Y, Col, AbsY);
     FNeedRedraw := True;
     Exit;
   end;
   // ----------------------------
 
-  // Дальше - стандартная обработка мыши для терминала
+//  IsMouseReporting := FBuffer.MouseModes <> [];
+  // --- ИЗМЕНЕНИЕ: OverrideSelection = ВСЕГДА, если зажат Shift ---
+  OverrideSelection := (ssShift in Shift);
+
+  if OverrideSelection then
+  begin
+     Cursor := crIBeam;
+     Exit;
+  end;
+
   var RepCol := Col + 1;
   var RepRow := Row + 1;
 
@@ -696,22 +742,56 @@ var
   LocalPos: TPointF;
   MouseService: IFMXMouseService;
   MousePos: TPointF;
+  I: Integer;
+  LinesToScroll: Integer;
 begin
-  // --- ЕСЛИ РЕЖИМ МЫШИ ВЫКЛЮЧЕН (например в 'cat') - СКРОЛЛИМ ИСТОРИЮ ---
+  // Определяем количество строк для скролла (обычно 3)
+  LinesToScroll := 3;
+
+  // --- СЛУЧАЙ 1: Мышь НЕ отслеживается (bash, nano, less) ---
   if not (mtm1002_Wheel in FBuffer.MouseModes) and
      not (mtm1006_SGR in FBuffer.MouseModes) then
   begin
-    if WheelDelta > 0 then
-       FBuffer.ScrollViewport(3) // Вверх по истории
-    else
-       FBuffer.ScrollViewport(-3); // Вниз
+    // Если это Альтернативный буфер (полноэкранное приложение без мыши, например nano/less),
+    // мы должны эмулировать нажатия клавиш ВВЕРХ/ВНИЗ
+    if FBuffer.IsAlternateBuffer then
+    begin
+      if Assigned(FOnData) then
+      begin
+        // --- ИЗМЕНЕНИЕ: Сбрасываем выделение при скролле клавишами ---
+        if FBuffer.HasSelection then
+        begin
+          FBuffer.ClearSelection;
+          FNeedRedraw := True;
+        end;
+        // -------------------------------------------------------------
 
-    FNeedRedraw := True;
+        for I := 1 to LinesToScroll do
+        begin
+          if WheelDelta > 0 then
+            FOnData(#27'[A') // Up Arrow
+          else
+            FOnData(#27'[B'); // Down Arrow
+        end;
+      end;
+    end
+    else
+    begin
+      // Обычный режим (bash) - скроллим историю
+      if WheelDelta > 0 then
+         FBuffer.ScrollViewport(LinesToScroll)
+      else
+         FBuffer.ScrollViewport(-LinesToScroll);
+
+      FNeedRedraw := True;
+    end;
+
     Handled := True;
     Exit;
   end;
   // ------------------------------------------------------------------------
 
+  // --- СЛУЧАЙ 2: Мышь отслеживается (mc, htop, vim с mouse=on) ---
   if (FRenderer.CharWidth = 0) or (FRenderer.CharHeight = 0) then Exit;
 
   if not TPlatformServices.Current.SupportsPlatformService(IFMXMouseService, MouseService) then
@@ -721,7 +801,6 @@ begin
   end;
 
   MousePos := MouseService.GetMousePos;
-
   LocalPos := AbsoluteToLocal(MousePos);
 
   Col := Trunc(LocalPos.X / FRenderer.CharWidth) + 1;

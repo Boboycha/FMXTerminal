@@ -1,0 +1,7 @@
+/__history
+/Demo/src/__history
+*.key
+*.local
+*.identcache
+*.dcu
+*.exe

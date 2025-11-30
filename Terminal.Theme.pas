@@ -116,7 +116,7 @@ var
 begin
   // --- *** ИСПРАВЛЕНИЕ: Кросс-платформенный путь *** ---
   // Используем PathDelim вместо '\'
-  FullFileName := ExtractFilePath(ParamStr(0)) + 'themes' + PathDelim + AFileName;
+  FullFileName := {ExtractFilePath(ParamStr(0)) + 'themes' + PathDelim +} AFileName;
   // --- *** КОНЕЦ ИСПРАВЛЕНИЯ *** ---
 
   if not TFile.Exists(FullFileName) then

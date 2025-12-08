@@ -1,0 +1,24 @@
+[Theme]
+Name=Default (MC)
+
+[Colors]
+; Цвета в 8-значном шестнадцатеричном формате AARRGGBB
+DefaultFG=FFE5E5E5
+DefaultBG=FF000000
+
+Ansi0=FF000000
+Ansi1=FFCD3131
+Ansi2=FF0DBC79
+Ansi3=FFE5E510
+Ansi4=FF2472C8
+Ansi5=FFBC3FBC
+Ansi6=FF11A8CD
+Ansi7=FFE5E5E5
+Ansi8=FF666666
+Ansi9=FFF14C4C
+Ansi10=FF23D18B
+Ansi11=FFF5F543
+Ansi12=FF3B8EEA
+Ansi13=FFD670D6
+Ansi14=FF29B8DB
+Ansi15=FFFFFFFF
